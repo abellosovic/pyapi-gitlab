@@ -595,7 +595,8 @@ class Gitlab(object):
         """
         data = {"id": project_id, "url": url}
         if kwargs:
-            data.update(kwargs)
+            for key, value in kwargs.iteritems():
+                data[key] = int(bool(value))
 
         request = requests.post("{0}/{1}/hooks".format(self.projects_url, project_id),
                                 headers=self.headers, data=data, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
@@ -614,7 +615,8 @@ class Gitlab(object):
         """
         data = {"id": project_id, "hook_id": hook_id, "url": url}
         if kwargs:
-            data.update(kwargs)
+            for key, value in kwargs.iteritems():
+                data[key] = int(bool(value))
 
         request = requests.put("{0}/{1}/hooks/{2}".format(self.projects_url, project_id, hook_id),
                                headers=self.headers, data=data, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
