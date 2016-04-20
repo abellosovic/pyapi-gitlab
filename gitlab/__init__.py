@@ -586,7 +586,7 @@ class Gitlab(object):
         else:
             return False
 
-    def addprojecthook(self, project_id, url, **kwargs):
+    def addprojecthook(self, project_id, url, push=False, issues=False, merge_requests=False, tag_push=False, **kwargs):
         """
         add a hook to a project
         :param id_: project id
@@ -594,6 +594,10 @@ class Gitlab(object):
         :return: True if success
         """
         data = {"id": project_id, "url": url}
+        data['push_events'] = int(bool(push))
+        data['issues_events'] = int(bool(issues))
+        data['merge_requests_events'] = int(bool(merge_requests))
+        data['tag_push_events'] = int(bool(tag_push))
         if kwargs:
             for key, value in kwargs.iteritems():
                 data[key] = int(bool(value))
@@ -605,7 +609,8 @@ class Gitlab(object):
         else:
             return False
 
-    def editprojecthook(self, project_id, hook_id, url, **kwargs):
+    def editprojecthook(self, project_id, hook_id, url, push=False,
+            issues=False, merge_requests=False, tag_push=False, **kwargs):
         """
         edit an existing hook from a project
         :param id_: project id
@@ -614,6 +619,10 @@ class Gitlab(object):
         :return: True if success
         """
         data = {"id": project_id, "hook_id": hook_id, "url": url}
+        data['push_events'] = int(bool(push))
+        data['issues_events'] = int(bool(issues))
+        data['merge_requests_events'] = int(bool(merge_requests))
+        data['tag_push_events'] = int(bool(tag_push))
         if kwargs:
             for key, value in kwargs.iteritems():
                 data[key] = int(bool(value))
