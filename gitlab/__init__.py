@@ -587,10 +587,14 @@ class Gitlab(object):
             return False
 
     def addprojecthook(self, project_id, url, push=False, issues=False, merge_requests=False, tag_push=False, **kwargs):
-        """
-        add a hook to a project
+        """Add a hook to a project
         :param id_: project id
         :param url: url of the hook
+        :param push: Trigger hook on push events
+        :param issues: Trigger hook on issues events
+        :param merge_requests: Trigger hook on merge_requests events
+        :param tag_push:  Trigger hook on push_tag events
+        :param kwargs: Any other param the the Gitlab API supports
         :return: True if success
         """
         data = {"id": project_id, "url": url}
@@ -611,11 +615,15 @@ class Gitlab(object):
 
     def editprojecthook(self, project_id, hook_id, url, push=False,
             issues=False, merge_requests=False, tag_push=False, **kwargs):
-        """
-        edit an existing hook from a project
+        """Edit an existing hook from a project
         :param id_: project id
         :param hook_id: hook id
         :param url: the new url
+        :param push: Trigger hook on push events
+        :param issues: Trigger hook on issues events
+        :param merge_requests: Trigger hook on merge_requests events
+        :param tag_push:  Trigger hook on push_tag events
+        :param kwargs: Any other param the the Gitlab API supports        
         :return: True if success
         """
         data = {"id": project_id, "hook_id": hook_id, "url": url}
