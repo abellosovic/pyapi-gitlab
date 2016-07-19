@@ -963,7 +963,7 @@ class Gitlab(object):
         :return: true if success
         """
         data = {"id": project_id, "issue_id": issue_id}
-        request = requests.delete("{0}/{1}/issues/{2}".format(self.projects_url, project_id, issue_id),
+        request = self.requests.delete("{0}/{1}/issues/{2}".format(self.projects_url, project_id, issue_id),
                                headers=self.headers, data=data, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
         if request.status_code == 200:
             return request.json()
