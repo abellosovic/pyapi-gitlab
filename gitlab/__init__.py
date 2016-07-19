@@ -1505,9 +1505,10 @@ class Gitlab(object):
         """
 
         data = {"tag_name": tag_name}
-        request = requests.delete("{0}/{1}/repository/tags/{2}".format(self.projects_url, project_id, tag_name), data=data,
-                                  verify=self.verify_ssl, auth=self.auth, headers=self.headers, timeout=self.timeout)
-
+        request = self.requests.delete(
+            "{0}/{1}/repository/tags/{2}".format(self.projects_url, project_id, tag_name), data=data,
+            verify=self.verify_ssl, auth=self.auth, headers=self.headers, timeout=self.timeout
+        )
 
         if request.status_code == 200:
             return request.json()
