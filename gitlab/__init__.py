@@ -514,18 +514,10 @@ class Gitlab(object):
 
         :param project_id: project id
         :param user_id: user id
-        :param access_level: access level, see gitlab help to know more
+        :param access_level: "owner", "master", "developer", "reporter", "guest"
         :return: True if success
         """
-        if isinstance(access_level, basestring):
-            if access_level.lower() == "master":
-                access_level = 40
-            elif access_level.lower() == "developer":
-                access_level = 30
-            elif access_level.lower() == "reporter":
-                access_level = 20
-            else:
-                access_level = 10
+        access_level = self.get_access_level_code(access_level=access_level)
         data = {"id": project_id, "user_id": user_id, "access_level": access_level}
 
         request = self.requests.post("{0}/{1}/members".format(self.projects_url, project_id),
@@ -541,20 +533,11 @@ class Gitlab(object):
 
         :param project_id: project id
         :param user_id: user id
-        :param access_level: access level
+        :param access_level: "owner", "master", "developer", "reporter", "guest"
         :return: True if success
         """
-        if access_level.lower() == "master":
-            access_level = 40
-        elif access_level.lower() == "developer":
-            access_level = 30
-        elif access_level.lower() == "reporter":
-            access_level = 20
-        else:
-            access_level = 10
-        data = {"id": project_id, "user_id": user_id,
-                "access_level": access_level}
-
+        access_level = self.get_access_level_code(access_level)
+        data = {"id": project_id, "user_id": user_id, "access_level": access_level}
         request = self.requests.put("{0}/{1}/members/{2}".format(self.projects_url, project_id, user_id),
                                     headers=self.headers, data=data, verify=self.verify_ssl, auth=self.auth,
                                     timeout=self.timeout)
@@ -1738,23 +1721,10 @@ class Gitlab(object):
         """Adds a project member to a project
 
         :param user_id: user id
-        :param access_level: access level, see gitlab help to know more
+        :param access_level: "owner", "master", "developer", "reporter", "guest"
         :return: True if success
         """
-        if not isinstance(access_level, int):
-            if access_level.lower() == "owner":
-                access_level = 50
-            elif access_level.lower() == "master":
-                access_level = 40
-            elif access_level.lower() == "developer":
-                access_level = 30
-            elif access_level.lower() == "reporter":
-                access_level = 20
-            elif access_level.lower() == "guest":
-                access_level = 10
-            else:
-                return False
-
+        access_level = self.get_access_level_code(access_level=access_level)
         data = {"id": group_id, "user_id": user_id, "access_level": access_level}
 
         request = self.requests.post("{0}/{1}/members".format(self.groups_url, group_id),
@@ -1767,23 +1737,10 @@ class Gitlab(object):
 
         :param group_id: group id
         :param user_id: user id
-        :param access_level: access level, see gitlab help to know more
+        :param access_level: "owner", "master", "developer", "reporter", "guest"
         :return: True if success
         """
-        if not isinstance(access_level, int):
-            if access_level.lower() == "owner":
-                access_level = 50
-            elif access_level.lower() == "master":
-                access_level = 40
-            elif access_level.lower() == "developer":
-                access_level = 30
-            elif access_level.lower() == "reporter":
-                access_level = 20
-            elif access_level.lower() == "guest":
-                access_level = 10
-            else:
-                return False
-
+        access_level = self.get_access_level_code(access_level=access_level)
         data = {"id": group_id, "user_id": user_id, "access_level": access_level}
 
         request = self.requests.put("{0}/{1}/members/{2}".format(self.groups_url, group_id, user_id),
@@ -2156,3 +2113,20 @@ class Gitlab(object):
             for x in results:
                 yield x
             page += 1
+
+    @staticmethod
+    def get_access_level_code(access_level):
+        """Returns code of access level
+        @:param access_level: "owner", "master", "developer", "reporter", "guest"
+        :return int: access level code
+        """
+        access_level = {
+            "owner": 50,
+            "master": 40,
+            "developer": 30,
+            "reporter": 20,
+            "guest": 10
+        }.get(access_level)
+        if not access_level:
+            raise AttributeError
+        return access_level
