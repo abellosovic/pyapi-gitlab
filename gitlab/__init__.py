@@ -719,27 +719,73 @@ class Gitlab(object):
             return False
 
     def getbranches(self, project_id):
-        """List all the branches from a project
-
-        :param project_id: project id
-        :return: the branches
+        """Get a list of repository branches from a project, sorted by name alphabetically.
+        GET /projects/:id/repository/branches
+        :param (int) project_id: project id
+        :return:
+        [
+          {
+            "name": "master",
+            "protected": true,
+            "developers_can_push": false,
+            "developers_can_merge": false,
+            "commit": {
+              "author_email": "john@example.com",
+              "author_name": "John Smith",
+              "authored_date": "2012-06-27T05:51:39-07:00",
+              "committed_date": "2012-06-28T03:44:20-07:00",
+              "committer_email": "john@example.com",
+              "committer_name": "John Smith",
+              "id": "7b5c3cc8be40ee161ae89a06bba6229da1032a0c",
+              "message": "add projects API",
+              "parent_ids": [
+                "4ad91d3c1144c406e50c7b33bae684bd6837faf8"
+              ]
+            }
+          },
+          ...
+        ]
         """
-        request = self.requests.get("{0}/{1}/repository/branches".format(self.projects_url, project_id),
-                                    headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
+        request = self.requests.get(
+            "{0}/{1}/repository/branches".format(self.projects_url, project_id),
+            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout
+        )
         if request.status_code == 200:
             return request.json()
         else:
             return False
 
     def getbranch(self, project_id, branch):
-        """List one branch from a project
+        """Get a single project repository branch.
+        GET /projects/:id/repository/branches/:branch
 
-        :param project_id: project id
-        :param branch: branch id
-        :return: the branch
+        :param project_id: The ID of a project
+        :param branch: The name of the branch
+        :return:
+        {
+          "name": "master",
+          "protected": true,
+          "developers_can_push": false,
+          "developers_can_merge": false,
+          "commit": {
+            "author_email": "john@example.com",
+            "author_name": "John Smith",
+            "authored_date": "2012-06-27T05:51:39-07:00",
+            "committed_date": "2012-06-28T03:44:20-07:00",
+            "committer_email": "john@example.com",
+            "committer_name": "John Smith",
+            "id": "7b5c3cc8be40ee161ae89a06bba6229da1032a0c",
+            "message": "add projects API",
+            "parent_ids": [
+              "4ad91d3c1144c406e50c7b33bae684bd6837faf8"
+            ]
+          }
+        }
         """
-        request = self.requests.get("{0}/{1}/repository/branches/{2}".format(self.projects_url, project_id, branch),
-                                    headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
+        request = self.requests.get(
+            "{0}/{1}/repository/branches/{2}".format(self.projects_url, project_id, branch),
+            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout
+        )
         if request.status_code == 200:
             return request.json()
         else:
@@ -747,6 +793,7 @@ class Gitlab(object):
 
     def createbranch(self, project_id, branch, ref):
         """Create branch from commit SHA or existing branch
+        POST /projects/:id/repository/branches
 
         :param project_id:  The ID of a project
         :param branch: The name of the branch
@@ -755,9 +802,10 @@ class Gitlab(object):
         """
         data = {"id": project_id, "branch_name": branch, "ref": ref}
 
-        request = self.requests.post("{0}/{1}/repository/branches".format(self.projects_url, project_id),
-                                     headers=self.headers, data=data, verify=self.verify_ssl, auth=self.auth,
-                                     timeout=self.timeout)
+        request = self.requests.post(
+            "{0}/{1}/repository/branches".format(self.projects_url, project_id), data=data,
+            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout
+        )
         if request.status_code == 201:
             return request.json()
         else:
@@ -765,30 +813,41 @@ class Gitlab(object):
 
     def deletebranch(self, project_id, branch):
         """Delete branch by name
-
+        DELETE /projects/:id/repository/branches/:branch
         :param project_id:  The ID of a project
         :param branch: The name of the branch
         :return: True if success, False if not
         """
 
-        request = self.requests.delete("{0}/{1}/repository/branches/{2}".format(self.projects_url, project_id, branch),
-                                       headers=self.headers, verify=self.verify_ssl, auth=self.auth,
-                                       timeout=self.timeout)
+        request = self.requests.delete(
+            "{0}/{1}/repository/branches/{2}".format(self.projects_url, project_id, branch),
+            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout
+        )
 
         if request.status_code == 200:
             return True
         else:
             return False
 
-    def protectbranch(self, project_id, branch):
-        """Protect a branch from changes
-
-        :param project_id: project id
-        :param branch: branch id
+    def protectbranch(self, project_id, branch, developers_can_push=None, developers_can_merge=None):
+        """Protects a single project repository branch. This is an idempotent function, protecting an already protected
+        repository branch still returns a 200 OK status code.
+        PUT /projects/:id/repository/branches/:branch/protect
+        :param project_id: The ID of a project
+        :param branch: The name of the branch
+        :param developers_can_push: Flag if developers can push to the branch
+        :param developers_can_merge: Flag if developers can merge to the branch
         :return: True if success
         """
+        params = {}
+        if developers_can_push is not None:
+            params.update({"developers_can_push": developers_can_push})
+        if developers_can_push is not None:
+            params.update({"developers_can_merge": developers_can_merge})
+
         request = self.requests.put(
             "{0}/{1}/repository/branches/{2}/protect".format(self.projects_url, project_id, branch),
+            params=params,
             headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
         if request.status_code == 200:
             return True
@@ -796,15 +855,17 @@ class Gitlab(object):
             return False
 
     def unprotectbranch(self, project_id, branch):
-        """Stop protecting a branch
-
-        :param project_id: project id
-        :param branch: branch id
-        :return: true if success
+        """Unprotects a single project repository branch. This is an idempotent function, unprotecting an already
+        unprotected repository branch still returns a 200 OK status code.
+        PUT /projects/:id/repository/branches/:branch/unprotect
+        :param project_id: The ID of a project
+        :param branch: The name of the branch
+        :return: True if success
         """
         request = self.requests.put(
             "{0}/{1}/repository/branches/{2}/unprotect".format(self.projects_url, project_id, branch),
-            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout)
+            headers=self.headers, verify=self.verify_ssl, auth=self.auth, timeout=self.timeout
+        )
         if request.status_code == 200:
             return True
         else:
@@ -815,7 +876,7 @@ class Gitlab(object):
 
         :param project_id: project id
         :param from_project_id: from id
-        :return: true if success
+        :return: True if success, False if not
         """
         data = {"id": project_id, "forked_from_id": from_project_id}
         request = self.requests.post("{0}/{1}/fork/{2}".format(self.projects_url, project_id, from_project_id),
