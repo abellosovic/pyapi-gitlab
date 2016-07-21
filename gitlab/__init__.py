@@ -158,10 +158,7 @@ class Gitlab(object):
         :return: True if it deleted, False if it couldn't. False could happen for several reasons, but there isn't a good way of differenting them
         """
         request = self.requests.delete("{0}/{1}".format(self.users_url, user_id), **self.rq_params)
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def currentuser(self):
         """Returns the current user parameters. The current user is linked
@@ -241,10 +238,7 @@ class Gitlab(object):
         """
         data = {"title": title, "key": key}
         request = self.requests.post(self.keys_url, data=data, **self.rq_params)
-        if request.status_code == 201:
-            return True
-        else:
-            return False
+        return request.status_code == 201
 
     def addsshkeyuser(self, user_id, title, key):
         """Add a new ssh key for the user identified by id
@@ -257,10 +251,7 @@ class Gitlab(object):
         data = {"title": title, "key": key}
 
         request = self.requests.post("{0}/{1}/keys".format(self.users_url, user_id), data=data, **self.rq_params)
-        if request.status_code == 201:
-            return True
-        else:
-            return False
+        return request.status_code == 201
 
     def deletesshkey(self, key_id):
         """Deletes an sshkey for the current user identified by id
@@ -269,10 +260,7 @@ class Gitlab(object):
         :return: False if it didn't delete it, True if it was deleted
         """
         request = self.requests.delete("{0}/{1}".format(self.keys_url, key_id),**self.rq_params)
-        if request.content == b"null":
-            return False
-        else:
-            return True
+        return request.content == b"null"
 
     def getprojects(self, page=1, per_page=20):
         """Returns a dictionary of all the projects
@@ -423,11 +411,8 @@ class Gitlab(object):
         :param project_id: project id
         :return: always true
         """
-        request = self.requests.delete("{0}/{1}".format(self.projects_url, project_id),
-                                       headers=self.headers, verify=self.verify_ssl, auth=self.auth,
-                                       timeout=self.timeout)
-        if request.status_code == 200:
-            return True
+        request = self.requests.delete("{0}/{1}".format(self.projects_url, project_id), **self.rq_params)
+        return request.status_code == 200
 
     def createprojectuser(self, user_id, name, **kwargs):
         """Creates a new project owned by the specified user. Available only for admins.
@@ -452,11 +437,7 @@ class Gitlab(object):
             data.update(kwargs)
 
         request = self.requests.post("{0}/user/{1}".format(self.projects_url, user_id), data=data, **self.rq_params)
-        if request.status_code == 201:
-            return True
-        else:
-
-            return False
+        return request.status_code == 201
 
     def getprojectmembers(self, project_id, query=None, page=1, per_page=20):
         """Lists the members of a given project id
@@ -492,10 +473,7 @@ class Gitlab(object):
         request = self.requests.post(
             "{0}/{1}/members".format(self.projects_url, project_id), data=data, **self.rq_params
         )
-        if request.status_code == 201:
-            return True
-        else:
-            return False
+        return request.status_code == 201
 
     def editprojectmember(self, project_id, user_id, access_level):
         """Edit a project member
@@ -509,10 +487,7 @@ class Gitlab(object):
         data = {"id": project_id, "user_id": user_id, "access_level": access_level}
         request = self.requests.put(
             "{0}/{1}/members/{2}".format(self.projects_url, project_id, user_id), data=data, **self.rq_params)
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def deleteprojectmember(self, project_id, user_id):
         """Delete a project member
@@ -524,8 +499,7 @@ class Gitlab(object):
         request = self.requests.delete(
             "{0}/{1}/members/{2}".format(self.projects_url, project_id, user_id), **self.rq_params
         )
-        if request.status_code == 200:
-            return True  # It always returns true
+        return request.status_code == 200
 
     def getprojecthooks(self, project_id, page=1, per_page=20):
         """Get all the hooks from a project
@@ -610,10 +584,7 @@ class Gitlab(object):
         request = self.requests.put(
             "{0}/{1}/hooks/{2}".format(self.projects_url, project_id, hook_id), data=data, **self.rq_params
         )
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def deleteprojecthook(self, project_id, hook_id):
         """Delete a project hook
@@ -624,10 +595,7 @@ class Gitlab(object):
         """
         request = self.requests.delete(
             "{0}/{1}/hooks/{2}".format(self.projects_url, project_id, hook_id), **self.rq_params)
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def getsystemhooks(self, page=1, per_page=20):
         """Get all system hooks
@@ -649,10 +617,7 @@ class Gitlab(object):
         """
         data = {"url": url}
         request = self.requests.post(self.hook_url, data=data, **self.rq_params)
-        if request.status_code == 201:
-            return True
-        else:
-            return False
+        return request.status_code == 201
 
     def testsystemhook(self, hook_id):
         """Test a system hook
@@ -675,10 +640,7 @@ class Gitlab(object):
         """
         data = {"id": hook_id}
         request = self.requests.delete("{0}/{1}".format(self.hook_url, hook_id), data=data, **self.rq_params)
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def getbranches(self, project_id):
         """Get a list of repository branches from a project, sorted by name alphabetically.
@@ -783,10 +745,7 @@ class Gitlab(object):
             "{0}/{1}/repository/branches/{2}".format(self.projects_url, project_id, branch), **self.rq_params
         )
 
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def protectbranch(self, project_id, branch, developers_can_push=None, developers_can_merge=None):
         """Protects a single project repository branch. This is an idempotent function, protecting an already protected
@@ -808,10 +767,7 @@ class Gitlab(object):
             "{0}/{1}/repository/branches/{2}/protect".format(self.projects_url, project_id, branch),
             params=params, **self.rq_params
         )
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def unprotectbranch(self, project_id, branch):
         """Unprotects a single project repository branch. This is an idempotent function, unprotecting an already
@@ -823,10 +779,7 @@ class Gitlab(object):
         """
         request = self.requests.put(
             "{0}/{1}/repository/branches/{2}/unprotect".format(self.projects_url, project_id, branch), **self.rq_params)
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def createforkrelation(self, project_id, from_project_id):
         """Create a fork relation. This DO NOT create a fork but only adds a link as fork the relation between 2 repositories
@@ -839,10 +792,7 @@ class Gitlab(object):
         request = self.requests.post(
             "{0}/{1}/fork/{2}".format(self.projects_url, project_id, from_project_id), data=data, **self.rq_params
         )
-        if request.status_code == 201:
-            return True
-        else:
-            return False
+        return request.status_code == 201
 
     def removeforkrelation(self, project_id):
         """Remove an existing fork relation. this DO NOT remove the fork,only the relation between them
@@ -853,10 +803,7 @@ class Gitlab(object):
         request = self.requests.delete(
             "{0}/{1}/fork".format(self.projects_url, project_id), **self.rq_params
         )
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def createfork(self, project_id):
         """Forks a project into the user namespace of the authenticated user.
@@ -869,10 +816,7 @@ class Gitlab(object):
             "{0}/fork/{1}".format(self.projects_url, project_id), timeout=self.timeout, verify=self.verify_ssl
         )
 
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def getissues(self, page=1, per_page=20):
         """Return a global list of issues for your user.
@@ -1121,10 +1065,7 @@ class Gitlab(object):
         request = self.requests.delete(
             "{0}/{1}/keys/{2}".format(self.projects_url, project_id, key_id),**self.rq_params
         )
-        if request.status_code == 200:
-            return True
-        else:
-            return False
+        return request.status_code == 200
 
     def creategroup(self, name, path, **kwargs):
         """Creates a new group
@@ -1552,11 +1493,7 @@ class Gitlab(object):
             "{0}/{1}/repository/commits/{2}/comments".format(self.projects_url, project_id, sha), data=data,
             **self.rq_params
         )
-        if request.status_code == 201:
-            return True
-        else:
-
-            return False
+        return request.status_code == 201
 
     def getrepositorycommits(self, project_id, ref_name=None, page=1, per_page=20):
         """Get a list of repository commits in a project.
@@ -1790,8 +1727,7 @@ class Gitlab(object):
         request = self.requests.delete(
             "{0}/{1}/members/{2}".format(self.groups_url, group_id, user_id), **self.rq_params
         )
-        if request.status_code == 200:
-            return True  # It always returns true
+        return request.status_code == 200
 
     def addldapgrouplink(self, group_id, cn, group_access, provider):
         """Add LDAP group link
